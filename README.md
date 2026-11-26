@@ -3,6 +3,12 @@
 
 A dark, responsive public-source research workspace with a React + TypeScript frontend, a Node.js/Express API, and local SQLite persistence.
 
+## Deploy to GitHub Pages
+
+The `Deploy to GitHub Pages` workflow builds and publishes the frontend on every push to `main` and on manual runs. In repository **Settings → Pages**, set the build and deployment source to **GitHub Actions**. The Vite base path is derived from the repository name, so project sites load their assets from the correct subpath.
+
+GitHub Pages is static hosting; it cannot run the Node API or safely hold provider secrets. The Pages build enables a static workspace: cases, findings, and lookup history are stored in the browser's local storage, and domain, public-IP, and email syntax/MX checks use browser-accessible public endpoints. Website fetches and secret-key integrations (VirusTotal, AbuseIPDB, Shodan, and HIBP) need a separately hosted backend; those are reported as unavailable instead of simulated. Browser storage is specific to that browser and deployment origin.
+
 ## Run locally
 
 Requirements: Node.js 20.19+ or 22.12+.

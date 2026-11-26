@@ -9,6 +9,7 @@ import {
   UserRound, X,
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { staticApi } from "./static-mode";
 
 type ToolKey = "domain" | "ip" | "website" | "username" | "email" | "image";
 type RecordMap = Record<string, unknown>;
@@ -55,6 +56,7 @@ function guessType(query: string): ToolKey {
 }
 
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
+  if (import.meta.env.VITE_STATIC_MODE === "true") return staticApi<T>(url, init);
   const response = await fetch(url, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
@@ -104,7 +106,7 @@ function App() {
     try {
       const data = await api<Dashboard>("/api/dashboard");
       setDashboard(data);
-      setBackendOnline(true);
+      setBackendOnline(import.meta.env.VITE_STATIC_MODE !== "true");
     } catch {
       setBackendOnline(false);
     }
@@ -319,7 +321,7 @@ function App() {
           <form className="global-search" onSubmit={(event) => { event.preventDefault(); startSearch((event.currentTarget.elements.namedItem("global-search") as HTMLInputElement).value); }}>
             <Search size={16} /><input name="global-search" placeholder="Search a domain, IP, email, username or URL..." aria-label="Universal search" /><kbd>↵</kbd>
           </form>
-          <div className="topbar-right"><span className={`connection ${backendOnline ? "online" : "offline"}`}><i />{backendOnline ? "API CONNECTED" : "DEMO MODE"}</span><button className="icon-btn top-info" title="Data source information" onClick={() => setToast("Lookups query public sources. Demo dashboard metrics are illustrative only.")}><Info size={17} /></button><div className="user-avatar top-avatar">AN</div></div>
+          <div className="topbar-right"><span className={`connection ${backendOnline ? "online" : "offline"}`}><i />{backendOnline ? "API CONNECTED" : import.meta.env.VITE_STATIC_MODE === "true" ? "STATIC · LOCAL DATA" : "DEMO MODE"}</span><button className="icon-btn top-info" title="Data source information" onClick={() => setToast(import.meta.env.VITE_STATIC_MODE === "true" ? "Investigation data is stored in this browser. Live lookups use public endpoints; private-key integrations require a backend." : "Lookups query public sources. Demo dashboard metrics are illustrative only.")}><Info size={17} /></button><div className="user-avatar top-avatar">AN</div></div>
         </header>
 
         <div className="content-scroll">
